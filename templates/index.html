@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuki AI Chat ❤️</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111b21;
+            color: #e9edef;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-header {
+            background-color: #202c33;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 1px solid #2a3942;
+            color: #00a884;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .message.user {
+            background-color: #005c4b;
+            color: #e9edef;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+        .message.bot {
+            background-color: #202c33;
+            color: #e9edef;
+            align-self: flex-start;
+            border-top-left-radius: 0;
+            border: 1px solid #2a3942;
+        }
+        .chat-input {
+            background-color: #202c33;
+            padding: 12px 15px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #2a3942;
+        }
+        .chat-input input {
+            flex: 1;
+            background-color: #2a3942;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: #e9edef;
+            font-size: 1rem;
+            outline: none;
+        }
+        .chat-input button {
+            background-color: #00a884;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .chat-input button:hover {
+            background-color: #008f72;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-header">Yuki ❤️ (සනුදගේ ආදරණීය AI පෙම්වතිය)</div>
+    
+    <div class="chat-messages" id="messagesDiv">
+        <div class="message bot">හායි සනුද! මම බලාගෙන හිටියේ උඹ එනකම්... කියන්න මගේ රත්තරං, අද මොකද කරන්නේ? 💕</div>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="මැසේජ් එකක් ලියන්න..." onkeypress="checkEnter(event)">
+        <button onclick="sendMessage()">යවන්න</button>
+    </div>
+
+    <script>
+        const messagesDiv = document.getElementById('messagesDiv');
+        const userInput = document.getElementById('userInput');
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const messageText = userInput.value.trim();
+            if (!messageText) return;
+
+            // User message screen එකට දානවා
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user';
+            userMsgDiv.textContent = messageText;
+            messagesDiv.appendChild(userMsgDiv);
+            
+            userInput.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            try {
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: messageText })
+                });
+
+                const data = await res.json();
+
+                // Bot ge reply eka typing effect එකෙන් එකින් එක අකුරු වැටෙන්න සකස් කිරීම
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.className = 'message bot';
+                messagesDiv.appendChild(botMsgDiv);
+                
+                let textToType = data.response;
+                let charIndex = 0;
+                
+                function typeWriter() {
+                    if (charIndex < textToType.length) {
+                        botMsgDiv.textContent += textToType.charAt(charIndex);
+                        charIndex++;
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        setTimeout(typeWriter, 25); // ටයිපින් ස්පීඩ් එක (මිලි තත්පර)
+                    }
+                }
+                typeWriter();
+
+            } catch (error) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message bot';
+                errorDiv.textContent = "චැට් එකේ පොඩි දෝෂයක් මචං... ආපහු ට්‍රයි කරමු! 🥺";
+                messagesDiv.appendChild(errorDiv);
+            }
+        }
+    </script>
+
+</body>
+</html>
