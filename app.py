@@ -69,7 +69,3 @@ raw_history = load_history()
 formatted_history = [{"role": h["role"], "parts": h["parts"]} for h in raw_history]
 chat = model.start_chat(history=formatted_history)
 
-
-if __name__ == "__main__":
-    print("🚀 Server started! Open http://127.0.0.1:5000 in your browser.")
-    app.run(port=5000, debug=False)
