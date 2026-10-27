@@ -74,7 +74,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> යූකි ❤️</title>
+    <title> YUKI ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Sinhala', sans-serif; }
@@ -99,8 +99,8 @@ HTML_TEMPLATE = """
         <div class="header">
             <div class="avatar">❤️</div>
             <div class="header-info">
-                <h2>සනුදගේ යූකි 🤭</h2>
-                <p id="statusText">Online | Model: gemini-3.8-flash</p>
+                <h2> YUKI 🤭</h2>
+                <p id="statusText">Online | Model:"gemini-3.1-flash-lite"</p>
             </div>
         </div>
         <div class="messages" id="messages">
@@ -141,7 +141,7 @@ HTML_TEMPLATE = """
                 const data = await res.json();
                 
                 // Reply එක ආපු වකුම ආපහු ස්ටේටස් එක වෙනස් කිරීම
-                statusText.textContent = "Online | Model: gemini-3.8-flash";
+                statusText.textContent = "Online | Creator: Sanuda-3.1-flash";
 
                 const botMsgDiv = document.createElement('div');
                 botMsgDiv.className = 'message bot';
@@ -168,9 +168,15 @@ def chat_api():
     if not user_message:
         return jsonify({"response": ""})
     
-    response = chat.send_message(user_message)
-    save_history(chat.history)
-    return jsonify({"response": response.text})
+    try:
+        response = chat.send_message(user_message)
+        try:
+            save_history(chat.history)
+        except Exception:
+            pass  # Vercel හි read-only ප්‍රශ්නය මඟ හැරීමට
+        return jsonify({"response": response.text})
+    except Exception as e:
+        return jsonify({"response": f"අයියෝ පැටියෝ පොඩි දෝෂයක් ආවා: {str(e)}"})
 
 if __name__ == "__main__":
     print("🚀 Server started! Open http://127.0.0.1:5000 in your browser.")
